@@ -12,14 +12,14 @@ from threading import Thread, Event
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
+import cmd_admin
 import schedule
 import db_user
 import cmd_user
 
-config = json.loads(open('bot.json', 'r').read())
-logging.basicConfig(format='[%(asctime)s] [%(levelname)s:%(name)s] %(message)s', level=logging.DEBUG,
-                    filename=config['logFileName'])
-logger = logging.getLogger(__name__)
+updater = None
+config = None
+logger = None
 
 
 def schedule_monitor(bot, run):
@@ -44,10 +44,24 @@ def schedule_monitor(bot, run):
 
 
 def main():
+    # INIT #
+    global config, logger, updater
+
+    config = json.loads(open('bot.json', 'r').read())
+    logger = logging.getLogger(__name__)
     updater = Updater(config['token'])
 
+    logging.basicConfig(format='[%(asctime)s] [%(levelname)s:%(name)s] %(message)s', level=logging.INFO,
+                        filename=config['logFileName'])
+
+    # User commands
     updater.dispatcher.add_handler(CommandHandler('start', cmd_user.menu))
     updater.dispatcher.add_handler(MessageHandler(Filters.text, cmd_user.processor))
+
+    # Admin commands
+    updater.dispatcher.add_handler(CommandHandler('broadcast', cmd_admin.broadcast))
+    updater.dispatcher.add_handler(CommandHandler('get_config', cmd_admin.get_config))
+    updater.dispatcher.add_handler(MessageHandler(Filters.document, cmd_admin.set_config))
 
     updater.start_polling(timeout=config['poolTimeout'])
 
