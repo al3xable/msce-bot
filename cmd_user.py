@@ -150,7 +150,7 @@ def processor(bot, update):
     if text == '[ В МЕНЮ ]':
         menu(bot, update)
 
-    elif text == '[ ЗАКРЫТЬ ]':
+    elif text == '[ ЗАКРЫТЬ ]' or text == '/cancel':
         update.message.reply_text('Меню закрыто.', reply_markup=ReplyKeyboardRemove())
         db_user.set_action(user.id, '')
 

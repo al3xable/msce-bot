@@ -1,8 +1,8 @@
 import json
 from shutil import move
 
+import db_content
 import db_user
-import mscebot
 
 
 def is_admin(uid):
@@ -15,6 +15,17 @@ def is_json(myjson):
     except ValueError:
         return False
     return True
+
+
+def help(bot, update):
+    if is_admin(update.message.from_user.id):
+        update.message.reply_text(db_content.get('master_help'))
+
+
+def stop(bot, update):
+    if is_admin(update.message.from_user.id):
+        update.message.reply_text('Bot will stopped soon...')
+        raise SystemExit(0)
 
 
 def broadcast(bot, update):

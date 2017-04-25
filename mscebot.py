@@ -56,9 +56,12 @@ def main():
 
     # User commands
     updater.dispatcher.add_handler(CommandHandler('start', cmd_user.menu))
+    updater.dispatcher.add_handler(CommandHandler('cancel', cmd_user.menu))
     updater.dispatcher.add_handler(MessageHandler(Filters.text, cmd_user.processor))
 
     # Admin commands
+    updater.dispatcher.add_handler(CommandHandler('help', cmd_admin.help))
+    updater.dispatcher.add_handler(CommandHandler('stop', cmd_admin.stop))
     updater.dispatcher.add_handler(CommandHandler('broadcast', cmd_admin.broadcast))
     updater.dispatcher.add_handler(CommandHandler('get_config', cmd_admin.get_config))
     updater.dispatcher.add_handler(MessageHandler(Filters.document, cmd_admin.set_config))
