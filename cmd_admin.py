@@ -1,8 +1,13 @@
 import json
+import os
 from shutil import move
+
+import logging
 
 import db_content
 import db_user
+
+logger = logging.getLogger(__name__)
 
 
 def is_admin(uid):
@@ -24,8 +29,9 @@ def help(bot, update):
 
 def stop(bot, update):
     if is_admin(update.message.from_user.id):
+        logger.info('User sent stop command! Bot will stopped soon...')
         update.message.reply_text('Bot will stopped soon...')
-        raise SystemExit(0)
+        os._exit(0)
 
 
 def broadcast(bot, update):

@@ -139,6 +139,23 @@ def sub_teacher(bot, update):
         db_user.set_action(id=user.id, action='sub_teacher')
 
 
+def menu(bot, update):  # Start menu
+    db_user.set_action(id=update.message.from_user.id, action='')
+
+    menu = [
+        [KeyboardButton("РАСПИСАНИЕ ДЛЯ УЧАЩИХСЯ")],
+        [KeyboardButton("РАСПИСАНИЕ ДЛЯ ПРЕПОДАВАТЕЛЕЙ")],
+        [KeyboardButton("РАСПИСАНИЕ ЗВОНКОВ")],
+        [KeyboardButton("ПОДПИСАТСЯ НА ГРУППУ")],
+        [KeyboardButton("ПОДПИСАТСЯ НА ПРЕПОДАВАТЕЛЯ")],
+        [KeyboardButton("ОБ АВТОРЕ")],
+        [KeyboardButton('[ ЗАКРЫТЬ ]')]
+    ]
+
+    update.message.reply_text('Главное меню. Выберите нужное действие.',
+                              reply_markup=ReplyKeyboardMarkup(menu, one_time_keyboard=True))
+
+
 def processor(bot, update):
     user = update.message.from_user
     text = update.message.text
@@ -147,7 +164,7 @@ def processor(bot, update):
 
     logger.info('{} {} ({}:@{}): {}'.format(user.first_name, user.last_name, user.id, user.username, text))
 
-    if text == '[ В МЕНЮ ]':
+    if text == '[ В МЕНЮ ]' or text == '/start':
         menu(bot, update)
 
     elif text == '[ ЗАКРЫТЬ ]' or text == '/cancel':
@@ -189,20 +206,3 @@ def processor(bot, update):
     elif text == 'ОБ АВТОРЕ':
         update.message.reply_text(db_content.get('about'))
         menu(bot, update)
-
-
-def menu(bot, update):  # Start menu
-    db_user.set_action(id=update.message.from_user.id, action='')
-
-    menu = [
-        [KeyboardButton("РАСПИСАНИЕ ДЛЯ УЧАЩИХСЯ")],
-        [KeyboardButton("РАСПИСАНИЕ ДЛЯ ПРЕПОДАВАТЕЛЕЙ")],
-        [KeyboardButton("РАСПИСАНИЕ ЗВОНКОВ")],
-        [KeyboardButton("ПОДПИСАТСЯ НА ГРУППУ")],
-        [KeyboardButton("ПОДПИСАТСЯ НА ПРЕПОДАВАТЕЛЯ")],
-        [KeyboardButton("ОБ АВТОРЕ")],
-        [KeyboardButton('[ ЗАКРЫТЬ ]')]
-    ]
-
-    update.message.reply_text('Главное меню. Выберите нужное действие.',
-                              reply_markup=ReplyKeyboardMarkup(menu, one_time_keyboard=True))
