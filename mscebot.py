@@ -7,7 +7,9 @@
 
 import json
 import logging
+from threading import Thread, Event
 
+import time
 from telegram import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
@@ -15,9 +17,9 @@ import database.user
 import schedule
 
 config = json.loads(open('bot.json', 'r').read())
-logging.basicConfig(format='[%(asctime)s] [%(levelname)s:%(name)s] %(message)s', level=logging.INFO,
+logging.basicConfig(format='[%(asctime)s] [%(levelname)s:%(name)s] %(message)s', level=logging.DEBUG,
                     filename=config['logFileName'])
-logger = logging.getLogger('bot')
+logger = logging.getLogger()
 
 
 def get_content(title):
@@ -54,7 +56,7 @@ def get_student(bot, update):
 
             database.user.set_action(id=user.id, action='get_student/' + date)
         else:  # Отправка расписания
-            update.message.reply_text(schedule.get_student(date, text))
+            update.message.reply_text(schedule.get_student(date=date, group=text))
             start(bot, update)
 
 
@@ -88,7 +90,7 @@ def get_teacher(bot, update):
 
             database.user.set_action(id=user.id, action='get_teacher/' + date)
         else:  # Отправка расписания
-            update.message.reply_text(schedule.get_teacher(date, text))
+            update.message.reply_text(schedule.get_teacher(date=date, name=text))
             start(bot, update)
 
 
@@ -223,14 +225,46 @@ def start(bot, update):  # Start menu
                               reply_markup=ReplyKeyboardMarkup(menu, one_time_keyboard=True))
 
 
+def schedule_monitor(bot, run):
+    logger.debug('Starting schedule monitor...')
+
+    while run.is_set():
+        if schedule.update_student():
+            for uid in database.user.get():
+                group = database.user.get_sub_student(uid)
+                if group is not None:
+                    bot.sendMessage(chat_id=uid, text=schedule.get_student(group=group))
+
+        if schedule.update_teacher():
+            for uid in database.user.get():
+                name = database.user.get_sub_teacher(uid)
+                if name is not None:
+                    bot.sendMessage(chat_id=uid, text=schedule.get_teacher(name=name))
+
+        time.sleep(config['updateSleep'])
+
+    logger.debug('Stopping schedule monitor...')
+
+
 def main():
     updater = Updater(config['token'])
-    logger.info('Starting {} (@{})...'.format(updater.bot.getMe().first_name, updater.bot.getMe().username))
 
     updater.dispatcher.add_handler(CommandHandler('start', start))
     updater.dispatcher.add_handler(MessageHandler(Filters.text, message))
 
-    updater.start_polling(timeout=20)
+    updater.start_polling(timeout=config['poolTimeout'])
+
+    run = Event()
+    run.set()
+
+    th = Thread(target=schedule_monitor, args=(updater.bot, run))
+    th.start()
+
+    updater.idle()
+
+    # Stopping thread
+    run.clear()
+    th.join()
 
 
 if __name__ == '__main__':

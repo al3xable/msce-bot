@@ -11,6 +11,18 @@ class ScheduleException(Exception):
         self.message = message
 
 
+student_last_date = None
+cache_student = {}
+
+
+def update_student():
+    global student_last_date
+    last = sorted(get_student_dates(), reverse=True)[0]
+    clast = student_last_date
+    student_last_date = last
+    return clast != last and clast is not None
+
+
 def get_student_dates():
     data = json.loads(
         urllib.request.urlopen('http://msce.bronydell.xyz/method/getStudentDates').read().decode())
@@ -47,7 +59,11 @@ def get_student_groups(date):
     return data['data']['groups']
 
 
-def get_student(date, group):
+def get_student(group, date=None):
+    if date is None:
+        global student_last_date
+        date = student_last_date
+
     data = json.loads(
         urllib.request.urlopen(
             'http://msce.bronydell.xyz/method/getStudent?date={}&group={}'.format(
@@ -62,6 +78,18 @@ def get_student(date, group):
         schedule += '{}. {}\nАудитория(и): {}\n\n'.format(lesson['number'], lesson['lesson'], lesson['audience'])
 
     return schedule
+
+
+teacher_last_date = None
+cache_teacher = {}
+
+
+def update_teacher():
+    global teacher_last_date
+    last = sorted(get_teacher_dates(), reverse=True)[0]
+    clast = teacher_last_date
+    teacher_last_date = last
+    return clast != last and clast is not None
 
 
 def get_teacher_list():
@@ -100,7 +128,11 @@ def get_teacher_names(date):
     return data['data']['groups']
 
 
-def get_teacher(date, name):
+def get_teacher(name, date=None):
+    if date is None:
+        global teacher_last_date
+        date = teacher_last_date
+
     data = json.loads(
         urllib.request.urlopen(
             'http://msce.bronydell.xyz/method/getTeacher?date={}&teacher={}'.format(

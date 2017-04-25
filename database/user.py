@@ -15,6 +15,15 @@ def update(user):
     db.close()
 
 
+def get():
+    db = sqlite3.connect('bot.db')
+    users = []
+    for user in db.execute("SELECT id FROM users").fetchall():
+        users.append(user[0])
+    db.close()
+    return users
+
+
 def get_al(id=None):  # Get user access level
     db = sqlite3.connect('bot.db')
     user = db.execute("SELECT al FROM users WHERE id=?", [id]).fetchall()
