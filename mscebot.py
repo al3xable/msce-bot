@@ -56,7 +56,7 @@ def main():
 
     # User commands
     updater.dispatcher.add_handler(CommandHandler('start', cmd_user.menu))
-    updater.dispatcher.add_handler(CommandHandler('cancel', cmd_user.menu))
+    updater.dispatcher.add_handler(CommandHandler('cancel', cmd_user.processor))
     updater.dispatcher.add_handler(MessageHandler(Filters.text, cmd_user.processor))
 
     # Admin commands
