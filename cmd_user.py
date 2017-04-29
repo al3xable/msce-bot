@@ -164,10 +164,10 @@ def processor(bot, update):
 
     logger.info('{} {} ({}:@{}): {}'.format(user.first_name, user.last_name, user.id, user.username, text))
 
-    if text == '[ В МЕНЮ ]' or text == '/start':
+    if text == '[ В МЕНЮ ]' or text.startswith('/start'):
         menu(bot, update)
 
-    elif text == '[ ЗАКРЫТЬ ]' or text == '/cancel':
+    elif text == '[ ЗАКРЫТЬ ]' or text.startswith('/cancel'):
         update.message.reply_text('Меню закрыто.', reply_markup=ReplyKeyboardRemove())
         db_user.set_action(user.id, '')
 
