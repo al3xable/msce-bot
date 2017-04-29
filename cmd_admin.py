@@ -6,6 +6,7 @@ import logging
 
 import db_content
 import db_user
+import schedule
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,32 @@ def is_json(myjson):
     return True
 
 
+def schedule_broadcast_student(bot):
+    for uid in db_user.get():
+        group = db_user.get_sub_student(uid)
+        if group is not None:
+            try:
+                bot.sendMessage(chat_id=uid, text=schedule.get_student(group=group))
+            except schedule.ScheduleException as ex:
+                if ex.code == 201:
+                    bot.sendMessage(chat_id=uid, text='У группы {} нет пар'.format(group))
+                else:
+                    bot.sendMessage(chat_id=uid, text='Ошибка {}: {}'.format(ex.code, ex.message))
+
+
+def schedule_broadcast_teacher(bot):
+    for uid in db_user.get():
+        name = db_user.get_sub_teacher(uid)
+        if name is not None:
+            try:
+                bot.sendMessage(chat_id=uid, text=schedule.get_teacher(name=name))
+            except schedule.ScheduleException as ex:
+                if ex.code == 201:
+                    bot.sendMessage(chat_id=uid, text='У преподавателя {} нет пар'.format(name))
+                else:
+                    bot.sendMessage(chat_id=uid, text='Ошибка {}: {}'.format(ex.code, ex.message))
+
+
 def help(bot, update):
     if is_admin(update.message.from_user.id):
         update.message.reply_text(db_content.get('master_help'))
@@ -34,14 +61,28 @@ def stop(bot, update):
         os._exit(0)
 
 
-def broadcast(bot, update):
+def text_broadcast(bot, update):
     if is_admin(update.message.from_user.id):
-        msg = update.message.text.replace('/broadcast', '', 1)
+        msg = update.message.text.replace('/tbcast ', '', 1)
         if msg == '':
             update.message.reply_text('Please, write text!')
         else:
             for uid in db_user.get():
                 bot.sendMessage(chat_id=uid, text=msg)
+
+
+def schedule_broadcast(bot, update):
+    if is_admin(update.message.from_user.id):
+        text = update.message.text.replace('/sbcast ', '', 1)
+        if text == 'student':
+            schedule_broadcast_student(bot)
+        elif text == 'teacher':
+            schedule_broadcast_teacher(bot)
+        elif text == 'all':
+            schedule_broadcast_student(bot)
+            schedule_broadcast_teacher(bot)
+        else:
+            update.message.reply_text('Available only student, teacher or all')
 
 
 def get_config(bot, update):

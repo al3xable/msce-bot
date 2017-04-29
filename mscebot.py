@@ -26,19 +26,16 @@ def schedule_monitor(bot, run):
     logger.debug('Starting schedule monitor...')
 
     while run.is_set():
-        if schedule.update_student():
-            for uid in db_user.get():
-                group = db_user.get_sub_student(uid)
-                if group is not None:
-                    bot.sendMessage(chat_id=uid, text=schedule.get_student(group=group))
+        try:
+            if schedule.update_student():
+                cmd_admin.schedule_broadcast_student(bot)
 
-        if schedule.update_teacher():
-            for uid in db_user.get():
-                name = db_user.get_sub_teacher(uid)
-                if name is not None:
-                    bot.sendMessage(chat_id=uid, text=schedule.get_teacher(name=name))
+            if schedule.update_teacher():
+                cmd_admin.schedule_broadcast_teacher(bot)
 
-        time.sleep(config['updateSleep'])
+            time.sleep(config['updateSleep'])
+        except:
+            logger.error('Schedule monitor exception')
 
     logger.debug('Stopping schedule monitor...')
 
@@ -62,7 +59,8 @@ def main():
     # Admin commands
     updater.dispatcher.add_handler(CommandHandler('help', cmd_admin.help))
     updater.dispatcher.add_handler(CommandHandler('stop', cmd_admin.stop))
-    updater.dispatcher.add_handler(CommandHandler('broadcast', cmd_admin.broadcast))
+    updater.dispatcher.add_handler(CommandHandler('tbcast', cmd_admin.text_broadcast))
+    updater.dispatcher.add_handler(CommandHandler('sbcast', cmd_admin.schedule_broadcast))
     updater.dispatcher.add_handler(CommandHandler('get_config', cmd_admin.get_config))
     updater.dispatcher.add_handler(MessageHandler(Filters.document, cmd_admin.set_config))
 

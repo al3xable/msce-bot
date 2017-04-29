@@ -61,18 +61,21 @@ def get_student_groups(date):
 
 def get_student(group, date=None):
     if date is None:
-        global student_last_date
-        date = student_last_date
-
-    data = json.loads(
-        urllib.request.urlopen(
-            'http://msce.bronydell.xyz/method/getStudent?date={}&group={}'.format(
-                urllib.parse.quote_plus(string=date, encoding='UTF-8'),
-                urllib.parse.quote_plus(string=group, encoding='UTF-8'))).read().decode())
+        data = json.loads(
+            urllib.request.urlopen(
+                'http://msce.bronydell.xyz/method/getStudent?group={}'.format(
+                    urllib.parse.quote_plus(string=group, encoding='UTF-8'))).read().decode())
+    else:
+        data = json.loads(
+            urllib.request.urlopen(
+                'http://msce.bronydell.xyz/method/getStudent?date={}&group={}'.format(
+                    urllib.parse.quote_plus(string=date, encoding='UTF-8'),
+                    urllib.parse.quote_plus(string=group, encoding='UTF-8'))).read().decode())
 
     if data['code'] != 0:
         raise ScheduleException(data['code'], data['message'])
 
+    date = '{}, {}'.format(data['data']['date'], get_weekday(data['data']['date']))
     schedule = 'Дата: {}\nГруппа: {}\n\n\n'.format(date, group)
     for lesson in data['data']['groups'][0]['lessons']:
         schedule += '{}. {}\nАудитория(и): {}\n\n'.format(lesson['number'], lesson['lesson'], lesson['audience'])
@@ -130,18 +133,21 @@ def get_teacher_names(date):
 
 def get_teacher(name, date=None):
     if date is None:
-        global teacher_last_date
-        date = teacher_last_date
-
-    data = json.loads(
-        urllib.request.urlopen(
-            'http://msce.bronydell.xyz/method/getTeacher?date={}&teacher={}'.format(
-                urllib.parse.quote_plus(string=date, encoding='UTF-8'),
-                urllib.parse.quote_plus(string=name, encoding='UTF-8'))).read().decode())
+        data = json.loads(
+            urllib.request.urlopen(
+                'http://msce.bronydell.xyz/method/getTeacher?teacher={}'.format(
+                    urllib.parse.quote_plus(string=name, encoding='UTF-8'))).read().decode())
+    else:
+        data = json.loads(
+            urllib.request.urlopen(
+                'http://msce.bronydell.xyz/method/getTeacher?date={}&teacher={}'.format(
+                    urllib.parse.quote_plus(string=date, encoding='UTF-8'),
+                    urllib.parse.quote_plus(string=name, encoding='UTF-8'))).read().decode())
 
     if data['code'] != 0:
         raise ScheduleException(data['code'], data['message'])
 
+    date = '{}, {}'.format(data['data']['date'], get_weekday(data['data']['date']))
     schedule = 'Дата: {}\nПреподаватель: {}\n\n\n'.format(date, name)
     for lesson in data['data']['groups'][0]['lessons']:
         schedule += '{}. {}\nАудитория(и): {}\n\n'.format(lesson['number'], lesson['lesson'], lesson['audience'])
