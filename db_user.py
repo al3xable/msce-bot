@@ -5,8 +5,8 @@ def update(user):
     db = sqlite3.connect('bot.db')
 
     if len(db.execute("SELECT id FROM users WHERE id=?", [user.id]).fetchall()) == 0:
-        db.execute("INSERT INTO users (id,first_name,last_name,username) VALUES (?,?,?,?)",
-                   [user.id, user.first_name, user.last_name, user.username])
+        db.execute("INSERT INTO users (id,first_name,last_name,username,action) VALUES (?,?,?,?,?)",
+                   [user.id, user.first_name, user.last_name, user.username, ''])
     else:
         db.execute("UPDATE users SET id=?, first_name=?, last_name=?, username=? WHERE id=?",
                    [user.id, user.first_name, user.last_name, user.username, user.id])
