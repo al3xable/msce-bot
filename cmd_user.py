@@ -1,9 +1,8 @@
 import logging
-
 from telegram import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 
-import db_user
 import db_content
+import db_user
 import schedule
 
 logger = logging.getLogger(__name__)
@@ -102,7 +101,7 @@ def sub_student(bot, update):
             info = 'Вы сейчас подписаны на группу ' + sub
             groups[0].append(KeyboardButton('[ ОТПИСАТСЯ ]'))
 
-        update.message.reply_text('Выберите или введите группу, на которую вы хотите подписатся\n'+info,
+        update.message.reply_text('Выберите или введите группу, на которую вы хотите подписатся\n' + info,
                                   reply_markup=ReplyKeyboardMarkup(groups, one_time_keyboard=True))
 
         db_user.set_action(id=user.id, action='sub_student')
@@ -133,7 +132,7 @@ def sub_teacher(bot, update):
             info = 'Вы сейчас подписаны на преподавателя ' + sub
             teachers[0].append(KeyboardButton('[ ОТПИСАТСЯ ]'))
 
-        update.message.reply_text('Выберите или введите преподавателя, на которого вы хотите подписатся\n'+info,
+        update.message.reply_text('Выберите или введите преподавателя, на которого вы хотите подписатся\n' + info,
                                   reply_markup=ReplyKeyboardMarkup(teachers, one_time_keyboard=True))
 
         db_user.set_action(id=user.id, action='sub_teacher')
