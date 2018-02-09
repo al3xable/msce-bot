@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 #
 # MSCE Schedule Telegram bot
-# by Alexander Zakharenko
-#
+# by Alexander Zakharenko reworked by Dmitriy Kuchinskiy
+# @al3xable and @wh1tef0x
 
 import json
 import logging
@@ -14,7 +14,6 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 import cmd_admin
 import schedule
-import db_user
 import cmd_user
 
 updater = None
