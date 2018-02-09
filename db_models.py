@@ -3,8 +3,9 @@ from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from mscebot import config
 
-DB_URI = 'sqlite:///bot_database.db'
+DB_URI = config['database']
 Base = declarative_base()
 engine = create_engine(DB_URI, echo=False)
 

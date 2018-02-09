@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 #
 # MSCE Schedule Telegram bot
-# by Alexander Zakharenko reworked by Dmitriy Kuchinskiy
-# @al3xable and @wh1tef0x
+# by Alexander Zakharenko @al3xable
+# reworked by Dmitriy Kuchinskiy and @wh1tef0x
+#  
 
 import json
 import logging
