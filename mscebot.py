@@ -14,7 +14,6 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 import cmd_admin
 import schedule
-import db_user
 import cmd_user
 
 updater = None

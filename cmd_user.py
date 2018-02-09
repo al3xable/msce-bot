@@ -51,7 +51,6 @@ def get_teacher(bot, update):
         dates = [[KeyboardButton('[ В МЕНЮ ]')]]
         for date in sorted(schedule.get_teacher_dates(), reverse=True):
             dates.append([KeyboardButton(date + ', ' + schedule.get_weekday(date))])
-
         update.message.reply_text('Выберите или ввидите дату, за которую нужно посмотреть расписание',
                                   reply_markup=ReplyKeyboardMarkup(dates, one_time_keyboard=True))
         db_user.set_action(id=user.id, action='get_teacher')

@@ -1,12 +1,11 @@
-import sqlite3
+from db_models import *
 
 
 def get(name=None):  # Get user access level
-    db = sqlite3.connect('bot.db')
-    user = db.execute("SELECT content FROM content WHERE name=?", [name]).fetchall()
-    db.close()
-
-    if len(user) == 0:
+    session = get_session()
+    line = session.query(Content).filter_by(name=name).first().content
+    session.close()
+    if len(line) == 0:
         return 0
     else:
-        return user[0][0]
+        return line
