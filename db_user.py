@@ -1,93 +1,89 @@
-from db_models import *
+import sqlite3
 
 
 def update(user):
-    session = get_session()
-    if get_user(user.id) is None:
-        new_user = Users(id=user.id, first_name=user.first_name, last_name=user.last_name, username=user.username)
-        session.add(new_user)
+    db = sqlite3.connect('bot.db')
+
+    if len(db.execute("SELECT id FROM users WHERE id=?", [user.id]).fetchall()) == 0:
+        db.execute("INSERT INTO users (id,first_name,last_name,username) VALUES (?,?,?,?)",
+                   [user.id, user.first_name, user.last_name, user.username])
     else:
-        upd_user = get_user(user.id)
-        upd_user.first_name = user.first_name
-        upd_user.last_name = user.last_name
-        upd_user.username = user.username
-        session.add(upd_user)
-    session.commit()
-    session.close()
+        db.execute("UPDATE users SET id=?, first_name=?, last_name=?, username=? WHERE id=?",
+                   [user.id, user.first_name, user.last_name, user.username, user.id])
+
+    db.commit()
+    db.close()
 
 
 def get():
-    session = get_session()
+    db = sqlite3.connect('bot.db')
     users = []
-    for user in session.query(Users).all():
-        users.append(user)
-    session.close()
+    for user in db.execute("SELECT id FROM users").fetchall():
+        users.append(user[0])
+    db.close()
     return users
 
 
-def get_al(id=None):
-    user = get_user(id)
-    if user is None:
+def get_al(id=None):  # Get user access level
+    db = sqlite3.connect('bot.db')
+    user = db.execute("SELECT al FROM users WHERE id=?", [id]).fetchall()
+    db.close()
+
+    if len(user) == 0:
         return 0
     else:
-        return user.al
+        return user[0][0]
 
 
-def get_user(id=None):
-    if id is not None:
-        session = get_session()
-        user = session.query(Users).filter_by(id=id).first()
-        session.close()
-        return user
-    return None
+def set_action(id=None, action=''):  # Set user action
+    db = sqlite3.connect('bot.db')
+    db.execute("UPDATE users SET action=? WHERE id=?", [action, id])
+    db.commit()
+    db.close()
 
 
-def set_action(id=None, action=''):
-    session = get_session()
-    user = get_user(id)
-    user.action = action
-    session.add(user)
-    session.commit()
-    session.close()
+def get_action(id=None):  # Get user action
+    db = sqlite3.connect('bot.db')
+    user = db.execute("SELECT action FROM users WHERE id=?", [id]).fetchall()
+    db.close()
 
-
-def get_action(id=None):
-    user = get_user(id)
-    if user is None:
+    if len(user) == 0:
         return ['']
     else:
-        return user.action.split('/')
+        return user[0][0].split('/')
 
 
-def set_sub_student(id=None, group=''):
-    session = get_session()
-    user = get_user(id)
-    user.sub_student = group
-    session.add(user)
-    session.commit()
-    session.close()
+def set_sub_student(id=None, group=''):  # Subscribe to student group
+    db = sqlite3.connect('bot.db')
+    db.execute("UPDATE users SET sub_student=? WHERE id=?", [group, id])
+    db.commit()
+    db.close()
 
 
-def get_sub_student(user=None):
-    user = get_user(user.id)
-    if user is not None:
-        return user.sub_student
+def get_sub_student(id=None):  # Get student subscribe group
+    db = sqlite3.connect('bot.db')
+    user = db.execute("SELECT sub_student FROM users WHERE id=?", [id]).fetchall()
+    db.close()
+
+    if len(user) > 0:
+        return user[0][0]
     else:
         return ''
 
 
-def set_sub_teacher(id=None, name=''):
-    session = get_session()
-    user = get_user(id)
-    user.sub_teacher = name
-    session.add(user)
-    session.commit()
-    session.close()
+def set_sub_teacher(id=None, name=''):  # Subscribe to teacher
+    db = sqlite3.connect('bot.db')
+    db.execute("UPDATE users SET sub_teacher=? WHERE id=?", [name, id])
+    db.commit()
+    db.close()
 
 
-def get_sub_teacher(user=None):
-    user = get_user(user.id)
-    if user is not None:
-        return user.sub_teacher
+def get_sub_teacher(id=None):  # Get teacher subscribe
+    db = sqlite3.connect('bot.db')
+    user = db.execute("SELECT sub_teacher FROM users WHERE id=?", [id]).fetchall()
+    db.close()
+
+    if len(user) > 0:
+        return user[0][0]
     else:
         return ''

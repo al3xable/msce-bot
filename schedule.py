@@ -51,7 +51,7 @@ def get_student_list():
 def get_student_groups(date):
     data = json.loads(
         urllib.request.urlopen('http://msce.bronydell.xyz/method/getStudent?date={}'.format(
-            urllib.parse.quote_plus(string=date, encoding='UTF-8'))).read().decode())
+                urllib.parse.quote_plus(string=date, encoding='UTF-8'))).read().decode())
 
     if data['code'] != 0:
         raise ScheduleException(data['code'], data['message'])
@@ -116,13 +116,14 @@ def get_teacher_dates():
 
     if data['code'] != 0:
         raise ScheduleException(data['code'], data['message'])
+
     return data['data']['dates'][-30:]
 
 
 def get_teacher_names(date):
     data = json.loads(
         urllib.request.urlopen('http://msce.bronydell.xyz/method/getTeacher?date={}'.format(
-            urllib.parse.quote_plus(string=date, encoding='UTF-8'))).read().decode())
+                urllib.parse.quote_plus(string=date, encoding='UTF-8'))).read().decode())
 
     if data['code'] != 0:
         raise ScheduleException(data['code'], data['message'])

@@ -1,8 +1,9 @@
 import logging
+
 from telegram import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 
-import db_content
 import db_user
+import db_content
 import schedule
 
 logger = logging.getLogger(__name__)
@@ -51,6 +52,7 @@ def get_teacher(bot, update):
         dates = [[KeyboardButton('[ В МЕНЮ ]')]]
         for date in sorted(schedule.get_teacher_dates(), reverse=True):
             dates.append([KeyboardButton(date + ', ' + schedule.get_weekday(date))])
+
         update.message.reply_text('Выберите или ввидите дату, за которую нужно посмотреть расписание',
                                   reply_markup=ReplyKeyboardMarkup(dates, one_time_keyboard=True))
         db_user.set_action(id=user.id, action='get_teacher')
@@ -100,7 +102,7 @@ def sub_student(bot, update):
             info = 'Вы сейчас подписаны на группу ' + sub
             groups[0].append(KeyboardButton('[ ОТПИСАТСЯ ]'))
 
-        update.message.reply_text('Выберите или введите группу, на которую вы хотите подписатся\n' + info,
+        update.message.reply_text('Выберите или введите группу, на которую вы хотите подписатся\n'+info,
                                   reply_markup=ReplyKeyboardMarkup(groups, one_time_keyboard=True))
 
         db_user.set_action(id=user.id, action='sub_student')
@@ -131,7 +133,7 @@ def sub_teacher(bot, update):
             info = 'Вы сейчас подписаны на преподавателя ' + sub
             teachers[0].append(KeyboardButton('[ ОТПИСАТСЯ ]'))
 
-        update.message.reply_text('Выберите или введите преподавателя, на которого вы хотите подписатся\n' + info,
+        update.message.reply_text('Выберите или введите преподавателя, на которого вы хотите подписатся\n'+info,
                                   reply_markup=ReplyKeyboardMarkup(teachers, one_time_keyboard=True))
 
         db_user.set_action(id=user.id, action='sub_teacher')
@@ -159,6 +161,13 @@ def processor(bot, update):
     text = update.message.text
     action = db_user.get_action(user.id)
     db_user.update(user)
+
+    if update.message.chat.id < 0:
+        if text.startswith('/'):
+            update.message.reply_text('Пожалуйста, пишите боту в ЛС. Не засоряйте чат.')
+            return
+        elif action != None and action != '':
+            return
 
     logger.info('{} {} ({}:@{}): {}'.format(user.first_name, user.last_name, user.id, user.username, text))
 
