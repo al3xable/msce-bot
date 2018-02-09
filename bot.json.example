@@ -1,0 +1,6 @@
+{
+  "token": "1234:YourBotToken",
+  "logFileName": "bot.log",
+  "poolTimeout": 20,
+  "updateSleep": 60
+}
