@@ -1,2 +1,3 @@
 # msce-bot-python
-MSCE Telegram bot (Python)
+MSCE Telegram bot
+Written on Python 3
