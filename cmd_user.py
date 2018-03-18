@@ -78,7 +78,7 @@ def get_teacher(bot, update):
             for teacher in schedule.get_teacher_names(date):
                 teachers.append([KeyboardButton(teacher['title'])])
 
-                log_message(update.message.reply_text(utils.get_constant('enter_teacher'),
+            log_message(update.message.reply_text(utils.get_constant('enter_teacher'),
                                       reply_markup=ReplyKeyboardMarkup(teachers, one_time_keyboard=True)))
 
             db_user.set_action(user_id=user.id, action='get_teacher/' + date)
