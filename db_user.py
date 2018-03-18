@@ -1,8 +1,10 @@
 import sqlite3
 
+DATABASE_NAME = 'bot.db'
+
 
 def update(user):
-    db = sqlite3.connect('bot.db')
+    db = sqlite3.connect(DATABASE_NAME)
 
     if len(db.execute("SELECT id FROM users WHERE id=?", [user.id]).fetchall()) == 0:
         db.execute("INSERT INTO users (id,first_name,last_name,username) VALUES (?,?,?,?)",
@@ -16,7 +18,7 @@ def update(user):
 
 
 def get():
-    db = sqlite3.connect('bot.db')
+    db = sqlite3.connect(DATABASE_NAME)
     users = []
     for user in db.execute("SELECT id FROM users").fetchall():
         users.append(user[0])
@@ -24,9 +26,9 @@ def get():
     return users
 
 
-def get_al(id=None):  # Get user access level
-    db = sqlite3.connect('bot.db')
-    user = db.execute("SELECT al FROM users WHERE id=?", [id]).fetchall()
+def get_al(user_id=None):  # Get user access level
+    db = sqlite3.connect(DATABASE_NAME)
+    user = db.execute("SELECT al FROM users WHERE id=?", [user_id]).fetchall()
     db.close()
 
     if len(user) == 0:
@@ -35,34 +37,50 @@ def get_al(id=None):  # Get user access level
         return user[0][0]
 
 
-def set_action(id=None, action=''):  # Set user action
-    db = sqlite3.connect('bot.db')
-    db.execute("UPDATE users SET action=? WHERE id=?", [action, id])
+def set_action(user_id=None, action=''):  # Set user action
+    db = sqlite3.connect(DATABASE_NAME)
+    db.execute("UPDATE users SET action=? WHERE id=?", [action, user_id])
     db.commit()
     db.close()
 
 
-def get_action(id=None):  # Get user action
-    db = sqlite3.connect('bot.db')
-    user = db.execute("SELECT action FROM users WHERE id=?", [id]).fetchall()
+def get_action(user_id=None):
+    """Get user's action and params
+           Parameters
+           ----------
+           user_id : int
+               User's id
+           Returns
+           -------
+            str
+                Action
+            list
+                Params
+           """
+    db = sqlite3.connect(DATABASE_NAME)
+    user = db.execute("SELECT action FROM users WHERE id=?", [user_id]).fetchall()
     db.close()
+    try:
+        if user is None or len(user) == 0:
+            return '', []
+        else:
+            splitted = user[0][0].split('/')
+            return splitted[0], splitted[1:]
+    except:
+        return '', []
 
-    if len(user) == 0:
-        return ['']
-    else:
-        return user[0][0].split('/')
 
 
-def set_sub_student(id=None, group=''):  # Subscribe to student group
-    db = sqlite3.connect('bot.db')
-    db.execute("UPDATE users SET sub_student=? WHERE id=?", [group, id])
+def set_sub_student(user_id=None, group=''):  # Subscribe to student group
+    db = sqlite3.connect(DATABASE_NAME)
+    db.execute("UPDATE users SET sub_student=? WHERE id=?", [group, user_id])
     db.commit()
     db.close()
 
 
-def get_sub_student(id=None):  # Get student subscribe group
-    db = sqlite3.connect('bot.db')
-    user = db.execute("SELECT sub_student FROM users WHERE id=?", [id]).fetchall()
+def get_sub_student(user_id=None):  # Get student subscribe group
+    db = sqlite3.connect(DATABASE_NAME)
+    user = db.execute("SELECT sub_student FROM users WHERE id=?", [user_id]).fetchall()
     db.close()
 
     if len(user) > 0:
@@ -71,16 +89,16 @@ def get_sub_student(id=None):  # Get student subscribe group
         return ''
 
 
-def set_sub_teacher(id=None, name=''):  # Subscribe to teacher
-    db = sqlite3.connect('bot.db')
-    db.execute("UPDATE users SET sub_teacher=? WHERE id=?", [name, id])
+def set_sub_teacher(user_id=None, name=''):  # Subscribe to teacher
+    db = sqlite3.connect(DATABASE_NAME)
+    db.execute("UPDATE users SET sub_teacher=? WHERE id=?", [name, user_id])
     db.commit()
     db.close()
 
 
-def get_sub_teacher(id=None):  # Get teacher subscribe
-    db = sqlite3.connect('bot.db')
-    user = db.execute("SELECT sub_teacher FROM users WHERE id=?", [id]).fetchall()
+def get_sub_teacher(user_id=None):  # Get teacher subscribe
+    db = sqlite3.connect(DATABASE_NAME)
+    user = db.execute("SELECT sub_teacher FROM users WHERE id=?", [user_id]).fetchall()
     db.close()
 
     if len(user) > 0:

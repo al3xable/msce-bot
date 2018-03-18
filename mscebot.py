@@ -5,7 +5,6 @@
 # by Alexander Zakharenko
 #
 
-import json
 import logging
 import time
 from threading import Thread, Event
@@ -15,7 +14,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import schedule
 import cmd_admin
 import cmd_user
-
+import utils
 
 updater = None
 config = None
@@ -44,16 +43,16 @@ def main():
     # INIT #
     global config, logger, updater
 
-    config = json.loads(open('bot.json', 'r').read())
+    config = utils.get_config()
     logger = logging.getLogger(__name__)
     updater = Updater(config['token'])
 
     logging.basicConfig(format='[%(asctime)s] [%(levelname)s:%(name)s] %(message)s', level=logging.INFO,
-                        filename=config['logFileName'])
+                        handlers=[logging.FileHandler(config['logFileName'], 'w', 'utf-8')])
 
     # User commands
-    updater.dispatcher.add_handler(CommandHandler('start', cmd_user.processor))
-    updater.dispatcher.add_handler(CommandHandler('cancel', cmd_user.processor))
+    updater.dispatcher.add_handler(CommandHandler('start', cmd_user.default_menu))
+    updater.dispatcher.add_handler(CommandHandler('cancel', cmd_user.close_keyboard))
     updater.dispatcher.add_handler(MessageHandler(Filters.text, cmd_user.processor))
 
     # Admin commands

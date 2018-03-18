@@ -1,0 +1,60 @@
+{
+  "default_menu": "menu",
+  "constants": {
+    "back_to_menu": "[ В МЕНЮ ]",
+    "close_keyboard": "[ ЗАКРЫТЬ ]",
+    "unsubscribe": "[ ОТПИСАТЬСЯ ]",
+    "enter_date": "Выберите или введите дату, за которую нужно посмотреть расписание",
+    "menu_closed": "Меню закрыто",
+    "enter_group": "Выберите или введите номер группы, для которой нужно посмотреть расписание",
+    "enter_teacher": "Выберите или введите имя преподавателя, для которого нужно посмотреть расписание",
+    "suc_unsubscribe": "Вы успешно отписались",
+    "suc_subscribe_group": "Подписка успешно установлена на группу {group}",
+    "suc_subscribe_teacher": "Подписка успешно установлена на группу {teacher}",
+    "subscribe_group": "Выберите или введите группу, на которую вы хотите подписаться\n{info}",
+    "subscribed_info_group": "Вы сейчас подписаны на группу {group}",
+    "subscribed_info_teacher": "Вы сейчас подписаны на группу {teacher}",
+    "not_subscribed_info": "Вы сейчас не подписаны",
+    "no_schedule_for_date": "Нет расписания за эту дату",
+    "no_group_schedule": "Нет расписания для этой группы за этот день",
+    "no_teacher_schedule": "Нет расписания для этого преподавателя за этот день",
+    "unknown_error": "Ошибка {code}: {message}",
+    "not_chat": "Пожалуйста, пишите боту в ЛС. Не засоряйте чат."
+  },
+  "constant_behavior": {
+    "close_keyboard": {
+      "action": "close_keyboard"
+    },
+    "back_to_menu":{
+      "action": "default_menu"
+    }
+  },
+  "menu": {
+    "text": "Главное меню. Выберите нужное действие",
+    "keyboard": [
+      {
+        "text": "РАСПИСАНИЕ ДЛЯ УЧАЩИХСЯ",
+        "action": "get_student"
+      },
+      {
+        "text": "РАСПИСАНИЕ ДЛЯ ПРЕПОДАВАТЕЛЕЙ",
+        "action": "get_teacher"
+      },
+      {
+        "text": "РАСПИСАНИЕ ЗВОНКОВ",
+        "text_file": "bells.txt"
+      },
+      {
+        "text": "ПОДПИСАТСЯ НА ГРУППУ",
+        "action": "sub_student"
+      },
+      {
+        "text": "ПОДПИСАТСЯ НА ПРЕПОДАВАТЕЛЯ",
+        "action": "sub_teacher"
+      },
+      {
+        "constant": "close_keyboard"
+      }
+    ]
+  }
+}
