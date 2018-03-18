@@ -1,14 +1,26 @@
 import json
 import os
 from shutil import move
-
+from functools import wraps
+from telegram.error import Unauthorized, RetryAfter
 import logging
 
-import db_content
 import db_user
+import utils
 import schedule
 
 logger = logging.getLogger(__name__)
+
+
+def admin_only(func):
+    @wraps(func)
+    def wrapped(bot, update, *args, **kwargs):
+        user_id = update.effective_user.id
+        if not is_admin(user_id):
+            print("Unauthorized access denied for {}.".format(user_id))
+            return
+        return func(bot, update, *args, **kwargs)
+    return wrapped
 
 
 def is_admin(uid):
@@ -34,6 +46,8 @@ def schedule_broadcast_student(bot):
                     bot.sendMessage(chat_id=uid, text='У группы {} нет пар'.format(group))
                 else:
                     bot.sendMessage(chat_id=uid, text='Ошибка {}: {}'.format(ex.code, ex.message))
+            except Unauthorized:
+                pass
 
 
 def schedule_broadcast_teacher(bot):
@@ -47,18 +61,20 @@ def schedule_broadcast_teacher(bot):
                     bot.sendMessage(chat_id=uid, text='У преподавателя {} нет пар'.format(name))
                 else:
                     bot.sendMessage(chat_id=uid, text='Ошибка {}: {}'.format(ex.code, ex.message))
+            except Unauthorized:
+                pass
 
 
+@admin_only
 def help(bot, update):
-    if is_admin(update.message.from_user.id):
-        update.message.reply_text(db_content.get('master_help'))
+    update.message.reply_text(utils.get_text('master_help.txt'))
 
 
+@admin_only
 def stop(bot, update):
-    if is_admin(update.message.from_user.id):
-        logger.info('User sent stop command! Bot will stopped soon...')
-        update.message.reply_text('Bot will stopped soon...')
-        os._exit(0)
+    logger.info('User sent stop command! Bot will stopped soon...')
+    update.message.reply_text('Bot will stopped soon...')
+    os._exit(0)
 
 
 def text_broadcast(bot, update):
@@ -68,7 +84,10 @@ def text_broadcast(bot, update):
             update.message.reply_text('Please, write text!')
         else:
             for uid in db_user.get():
-                bot.sendMessage(chat_id=uid, text=msg)
+                try:
+                    bot.sendMessage(chat_id=uid, text=msg)
+                except Unauthorized:
+                    pass
 
 
 def schedule_broadcast(bot, update):

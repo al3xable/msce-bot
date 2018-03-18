@@ -1,0 +1,8 @@
+List of available commands:
+/help -- list of available commands
+/tbcast <text> -- text broadcast
+/sbcast <student|teacher|all> -- schedule broadcast
+/stop -- stop bot
+/get_config -- get current config
+
+You can upload .json file to change config
