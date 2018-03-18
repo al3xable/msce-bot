@@ -8,6 +8,12 @@ import schedule
 logger = logging.getLogger(__name__)
 
 
+def log_message(message):
+    print(message)
+    logger.info('Bot resounded to @{}({}) with text : {}'
+                .format(message.chat.username, message.chat.id, message.text))
+
+
 def generic_menu(menu_name, update: Update):
     settings = utils.get_settings()
     if menu_name in settings:
@@ -16,7 +22,7 @@ def generic_menu(menu_name, update: Update):
         for button in menu['keyboard']:
             buttons.append(get_button_text(button))
         buttons = ReplyKeyboardMarkup(utils.generate_markup(buttons))
-        update.effective_message.reply_text(menu['text'], reply_markup=buttons)
+        log_message(update.effective_message.reply_text(menu['text'], reply_markup=buttons))
         db_user.set_action(user_id=update.effective_user.id, action=menu_name)
 
 
@@ -29,7 +35,7 @@ def get_student(bot, update):
         if len(params) > 0:
             # If we have more than one param(it's probably date) then print group's schedule with that param
             date = params[0]
-            update.message.reply_text(schedule.get_student(date=date, group=text))
+            log_message(update.message.reply_text(schedule.get_student(date=date, group=text)))
             default_menu(bot, update)
         else:
             # If we have none params, then we should save date and let user enter group
@@ -38,8 +44,8 @@ def get_student(bot, update):
             for group in schedule.get_student_groups(date):
                 groups.append([KeyboardButton(group['title'])])
 
-            update.message.reply_text(utils.get_constant('enter_group'),
-                                      reply_markup=ReplyKeyboardMarkup(groups, one_time_keyboard=True))
+            log_message(update.message.reply_text(utils.get_constant('enter_group'),
+                                      reply_markup=ReplyKeyboardMarkup(groups, one_time_keyboard=True)))
 
             db_user.set_action(user_id=user.id, action='get_student/{date}'.format(date=date))
 
@@ -49,8 +55,8 @@ def get_student(bot, update):
         for date in sorted(schedule.get_student_dates(), reverse=True):
             dates.append([KeyboardButton(date + ', ' + schedule.get_weekday(date))])
 
-        update.message.reply_text(utils.get_constant('enter_date'),
-                                  reply_markup=ReplyKeyboardMarkup(dates, one_time_keyboard=True))
+        log_message(update.message.reply_text(utils.get_constant('enter_date'),
+                                  reply_markup=ReplyKeyboardMarkup(dates, one_time_keyboard=True)))
         db_user.set_action(user_id=user.id, action='get_student')
 
 
@@ -63,7 +69,7 @@ def get_teacher(bot, update):
         if len(params) > 0:
             # If we have more than one param(it's probably date) then print schedule with that param
             date = params[0]
-            update.message.reply_text(schedule.get_teacher(date=date, name=text))
+            log_message(update.message.reply_text(schedule.get_teacher(date=date, name=text)))
             default_menu(bot, update)
         else:
             # If we have none params, then we should save date and let user enter teacher's name
@@ -72,8 +78,8 @@ def get_teacher(bot, update):
             for teacher in schedule.get_teacher_names(date):
                 teachers.append([KeyboardButton(teacher['title'])])
 
-            update.message.reply_text(utils.get_constant('enter_teacher'),
-                                      reply_markup=ReplyKeyboardMarkup(teachers, one_time_keyboard=True))
+                log_message(update.message.reply_text(utils.get_constant('enter_teacher'),
+                                      reply_markup=ReplyKeyboardMarkup(teachers, one_time_keyboard=True)))
 
             db_user.set_action(user_id=user.id, action='get_teacher/' + date)
     else:
@@ -82,8 +88,8 @@ def get_teacher(bot, update):
         for date in sorted(schedule.get_teacher_dates(), reverse=True):
             dates.append([KeyboardButton(date + ', ' + schedule.get_weekday(date))])
 
-        update.message.reply_text(utils.get_constant('enter_date'),
-                                  reply_markup=ReplyKeyboardMarkup(dates, one_time_keyboard=True))
+        log_message(update.message.reply_text(utils.get_constant('enter_date'),
+                                  reply_markup=ReplyKeyboardMarkup(dates, one_time_keyboard=True)))
         db_user.set_action(user_id=user.id, action='get_teacher')
 
 
@@ -95,9 +101,9 @@ def sub_student(bot, update):
     if action == 'sub_student':
         if text == utils.get_constant('unsubscribe'):
             text = None
-            update.message.reply_text(utils.get_constant('suc_unsubscribe'))
+            log_message(update.message.reply_text(utils.get_constant('suc_unsubscribe')))
         else:
-            update.message.reply_text(utils.get_constant('suc_subscribe_group').format(group=text))
+            log_message(update.message.reply_text(utils.get_constant('suc_subscribe_group').format(group=text)))
 
         db_user.set_sub_student(user_id=user.id, group=text)
         default_menu(bot, update)
@@ -112,8 +118,8 @@ def sub_student(bot, update):
             info = utils.get_constant('subscribed_info_group').format(group=sub)
             groups[0].append(KeyboardButton(utils.get_constant('unsubscribe')))
 
-        update.message.reply_text(utils.get_constant('subscribe_group').format(info=info),
-                                  reply_markup=ReplyKeyboardMarkup(groups, one_time_keyboard=True))
+        log_message(update.message.reply_text(utils.get_constant('subscribe_group').format(info=info),
+                                  reply_markup=ReplyKeyboardMarkup(groups, one_time_keyboard=True)))
 
         db_user.set_action(user_id=user.id, action='sub_student')
 
@@ -126,9 +132,9 @@ def sub_teacher(bot, update):
     if action == 'sub_teacher':
         if text == utils.get_constant('unsubscribe'):
             text = None
-            update.message.reply_text(utils.get_constant('suc_unsubscribe'))
+            log_message(update.message.reply_text(utils.get_constant('suc_unsubscribe')))
         else:
-            update.message.reply_text(utils.get_constant('suc_subscribe_teacher').format(teacher=text))
+            log_message(update.message.reply_text(utils.get_constant('suc_subscribe_teacher').format(teacher=text)))
         db_user.set_sub_teacher(user_id=user.id, name=text)
         default_menu(bot, update)
     else:
@@ -142,8 +148,9 @@ def sub_teacher(bot, update):
             info = utils.get_constant('subscribed_info_teacher').format(teacher=sub)
             teachers[0].append(KeyboardButton(utils.get_constant('unsubscribe')))
 
-        update.message.reply_text('Выберите или введите преподавателя, на которого вы хотите подписатся\n'+info,
-                                  reply_markup=ReplyKeyboardMarkup(teachers, one_time_keyboard=True))
+        log_message(
+            update.message.reply_text('Выберите или введите преподавателя, на которого вы хотите подписатся\n' + info,
+                                      reply_markup=ReplyKeyboardMarkup(teachers, one_time_keyboard=True)))
 
         db_user.set_action(user_id=user.id, action='sub_teacher')
 
@@ -159,23 +166,23 @@ def action_manager(bot, update, action):
             get_student(bot, update)
         except schedule.ScheduleException as ex:
             if ex.code == 200:
-                update.message.reply_text(utils.get_constant('no_schedule_for_date'))
+                log_message(update.message.reply_text(utils.get_constant('no_schedule_for_date')))
             elif ex.code == 201:
-                update.message.reply_text(utils.get_constant('no_group_schedule'))
+                log_message(update.message.reply_text(utils.get_constant('no_group_schedule')))
             else:
-                update.message.reply_text(utils.get_constant('unknown_error').format(code=ex.code,
-                                                                                     message=ex.message))
+                log_message( update.message.reply_text(utils.get_constant('unknown_error').format(code=ex.code,
+                                                                                     message=ex.message)))
     elif action == 'get_teacher':
         try:
             get_teacher(bot, update)
         except schedule.ScheduleException as ex:
             if ex.code == 200:
-                update.message.reply_text(utils.get_constant('no_schedule_for_date'))
+                log_message(update.message.reply_text(utils.get_constant('no_schedule_for_date')))
             elif ex.code == 201:
-                update.message.reply_text(utils.get_constant('no_teacher_schedule'))
+                log_message(update.message.reply_text(utils.get_constant('no_teacher_schedule')))
             else:
-                update.message.reply_text(utils.get_constant('unknown_error').format(code=ex.code,
-                                                                                     message=ex.message))
+                log_message(update.message.reply_text(utils.get_constant('unknown_error').format(code=ex.code,
+                                                                                     message=ex.message)))
     elif action == 'sub_student':
         sub_student(bot, update)
     elif action == 'sub_teacher':
@@ -188,7 +195,7 @@ def action_manager(bot, update, action):
 
 
 def close_keyboard(bot, update):
-    update.message.reply_text(utils.get_constant('menu_closed'), reply_markup=ReplyKeyboardRemove())
+    log_message(update.message.reply_text(utils.get_constant('menu_closed'), reply_markup=ReplyKeyboardRemove()))
     db_user.set_action(update.effective_user.id, '')
 
 
@@ -206,9 +213,9 @@ def behave(button, bot, update):
     elif 'action' in button:
         action_manager(bot, update, button['action'])
     elif 'text_file' in button:
-        update.effective_message.reply_text(utils.get_text(button['text_file']))
+        log_message(update.effective_message.reply_text(utils.get_text(button['text_file'])))
     elif 'text' in button:
-        update.effective_message.reply_text(button['text'])
+        log_message(update.effective_message.reply_text(button['text']))
 
 
 # bot's entry point
@@ -222,7 +229,7 @@ def processor(bot, update):
     # Check if it is group chat
     if update.message.chat.id < 0:
         if text.startswith('/'):
-            update.message.reply_text(utils.get_constant('not_chat'))
+            log_message(update.message.reply_text(utils.get_constant('not_chat')))
         return
 
     # logging
@@ -241,5 +248,3 @@ def processor(bot, update):
                 behave(button, bot, update)
     else:
         action_manager(bot, update, action)
-
-
